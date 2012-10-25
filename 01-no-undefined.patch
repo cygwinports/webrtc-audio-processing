@@ -1,0 +1,8 @@
+--- origsrc/webrtc-audio-processing-0.1/src/modules/audio_processing/Makefile.am	2011-10-20 23:28:24.000000000 -0500
++++ src/webrtc-audio-processing-0.1/src/modules/audio_processing/Makefile.am	2012-10-25 15:10:56.971939800 -0500
+@@ -56,4 +56,4 @@ libwebrtc_audio_processing_la_LIBADD = $
+ 				       $(top_builddir)/src/modules/audio_processing/aec/libaec.la \
+ 				       $(top_builddir)/src/modules/audio_processing/aecm/libaecm.la \
+ 				       $(top_builddir)/src/modules/audio_processing/agc/libagc.la
+-libwebrtc_audio_processing_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LIBWEBRTC_AUDIO_PROCESSING_VERSION_INFO)
++libwebrtc_audio_processing_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LIBWEBRTC_AUDIO_PROCESSING_VERSION_INFO) -no-undefined

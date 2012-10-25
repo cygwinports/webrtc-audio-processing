@@ -1,0 +1,20 @@
+NAME="webrtc-audio-processing"
+VERSION=0.1
+RELEASE=1
+CATEGORY="Audio"
+SUMMARY="Web Real-Time Communication Audio Processing library"
+DESCRIPTION="This is meant to be a more Linux packaging friendly copy of the
+AudioProcessing module from the WebRTC (Web-based real-time communication)
+project."
+HOMEPAGE="http://freedesktop.org/software/pulseaudio/webrtc-audio-processing/"
+SRC_URI="http://freedesktop.org/software/pulseaudio/${NAME}/${NAME}-${VERSION}.tar.xz"
+PATCH_URI="01-no-undefined.patch"
+
+PKG_NAMES="lib${NAME}0 lib${NAME}-devel"
+libwebrtc_audio_processing0_SUMMARY="${SUMMARY} (runtime)"
+libwebrtc_audio_processing0_CONTENTS="usr/bin/*-0.dll usr/share/doc/"
+libwebrtc_audio_processing_devel_SUMMARY="${SUMMARY} (development)"
+libwebrtc_audio_processing_devel_CONTENTS="usr/include/ usr/lib/"
+
+DOCS="PATENTS"
+KEEP_LA_FILES="none"
