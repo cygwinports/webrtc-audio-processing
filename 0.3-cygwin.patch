@@ -1,0 +1,73 @@
+--- origsrc/webrtc-audio-processing-0.3/configure.ac	2016-06-22 01:46:41.000000000 -0500
++++ src/webrtc-audio-processing-0.3/configure.ac	2016-07-27 21:38:22.921782800 -0500
+@@ -50,8 +50,14 @@ AS_CASE(["${host}"],
+              [OS_FLAGS="-DWEBRTC_MAC -DWEBRTC_IOS"],
+              [OS_FLAGS="-DWEBRTC_MAC"])
+          PLATFORM_CFLAGS="-DWEBRTC_POSIX"
++        ],
++    [*-mingw*],
++        [
++         PLATFORM_CFLAGS="-DWEBRTC_WIN"
++        ],
++        [
++         PLATFORM_CFLAGS="-DWEBRTC_POSIX"
+         ]
+-    # FIXME: Add Windows support
+ )
+ AC_SUBST(PLATFORM_CFLAGS)
+ 
+--- origsrc/webrtc-audio-processing-0.3/webrtc/base/checks.cc	2015-10-15 05:48:47.000000000 -0500
++++ src/webrtc-audio-processing-0.3/webrtc/base/checks.cc	2016-07-27 23:58:19.393356400 -0500
+@@ -16,7 +16,7 @@
+ #include <cstdio>
+ #include <cstdlib>
+ 
+-#if defined(__GLIBCXX__) && !defined(__UCLIBC__)
++#if defined(__GLIBCXX__) && defined(__GLIBC__)
+ #include <cxxabi.h>
+ #include <execinfo.h>
+ #endif
+@@ -55,7 +55,7 @@ void PrintError(const char* format, ...)
+ // to get usable symbols on Linux. This is copied from V8. Chromium has a more
+ // advanced stace trace system; also more difficult to copy.
+ void DumpBacktrace() {
+-#if defined(__GLIBCXX__) && !defined(__UCLIBC__)
++#if defined(__GLIBCXX__) && defined(__GLIBC__)
+   void* trace[100];
+   int size = backtrace(trace, sizeof(trace) / sizeof(*trace));
+   char** symbols = backtrace_symbols(trace, size);
+--- origsrc/webrtc-audio-processing-0.3/webrtc/base/platform_thread.cc	2015-10-15 05:48:44.000000000 -0500
++++ src/webrtc-audio-processing-0.3/webrtc/base/platform_thread.cc	2016-07-28 03:34:53.698196300 -0500
+@@ -18,6 +18,9 @@
+ #include <sys/prctl.h>
+ #include <sys/syscall.h>
+ #endif
++#ifdef __CYGWIN__
++extern "C" unsigned long pthread_getsequence_np(pthread_t);
++#endif
+ 
+ namespace rtc {
+ 
+@@ -28,6 +31,8 @@ PlatformThreadId CurrentThreadId() {
+ #elif defined(WEBRTC_POSIX)
+ #if defined(WEBRTC_MAC) || defined(WEBRTC_IOS)
+   ret = pthread_mach_thread_np(pthread_self());
++#elif defined(__CYGWIN__)
++  ret = pthread_getsequence_np(pthread_self());
+ #elif defined(WEBRTC_LINUX)
+   ret =  syscall(__NR_gettid);
+ #elif defined(WEBRTC_ANDROID)
+--- origsrc/webrtc-audio-processing-0.3/webrtc/base/platform_thread.h	2015-10-15 05:48:44.000000000 -0500
++++ src/webrtc-audio-processing-0.3/webrtc/base/platform_thread.h	2016-07-28 03:34:02.400770200 -0500
+@@ -25,7 +25,11 @@ namespace rtc {
+ typedef DWORD PlatformThreadId;
+ typedef DWORD PlatformThreadRef;
+ #elif defined(WEBRTC_POSIX)
++#ifdef __CYGWIN__
++typedef unsigned long PlatformThreadId;
++#else
+ typedef pid_t PlatformThreadId;
++#endif
+ typedef pthread_t PlatformThreadRef;
+ #endif
+ 
